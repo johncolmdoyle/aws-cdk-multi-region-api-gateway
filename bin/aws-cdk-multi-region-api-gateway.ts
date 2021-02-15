@@ -10,7 +10,7 @@ const zoneDomain = 'gizmo.codes';
 const subDomain = 'global.';
 
 // Table configuration
-const globalTableName = 'multi-region-exmaple';
+const globalTableName = 'multi-region-example';
 const primaryKeyName = 'id';
 
 // Region configurations
@@ -27,17 +27,19 @@ const globalstack = new GlobalStack(app, 'GlobalStack', {
     replicationRegions: tableReplicatedRegions
 });
 
-const certstack = new CertStack(app, 'CertStack', {
-    env: {account: process.env.CDK_DEFAULT_ACCOUNT, region: primaryTableRegion},
+appRegions.forEach(function (item, index) {
+  const certstack = new CertStack(app, 'CertStack-' + item, {
+    env: {account: process.env.CDK_DEFAULT_ACCOUNT, region: item},
     domainName: zoneDomain,
     subDomainName: subDomain
-});
+  });
 
-new AppStack(app, 'AppStack', {
-    env: {account: process.env.CDK_DEFAULT_ACCOUNT, region: primaryTableRegion},
+  new AppStack(app, 'AppStack-' + item, {
+    env: {account: process.env.CDK_DEFAULT_ACCOUNT, region: item},
     domainName: zoneDomain,
     subDomainName: subDomain,
     certificate: certstack.cert,
     globalTableName: globalTableName,
     globalTablePrimaryKeyName: primaryKeyName 
+  });
 });

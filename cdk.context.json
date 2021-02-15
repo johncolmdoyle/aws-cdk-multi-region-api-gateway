@@ -2,5 +2,9 @@
   "hosted-zone:account=196295636944:domainName=gizmo.codes:region=us-west-2": {
     "Id": "/hostedzone/Z00708303LRYNQLQ3PIPP",
     "Name": "gizmo.codes."
+  },
+  "hosted-zone:account=196295636944:domainName=gizmo.codes:region=us-east-2": {
+    "Id": "/hostedzone/Z00708303LRYNQLQ3PIPP",
+    "Name": "gizmo.codes."
   }
 }

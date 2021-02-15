@@ -61,13 +61,13 @@ export class AppStack extends cdk.Stack {
       // API Lambdas
       const getLambda = new lambda.Function(this, 'getLambda', {
         code: new lambda.AssetCode('src'),
-        handler: 'get.handler',
+        handler: 'src/get.handler',
         runtime: lambda.Runtime.NODEJS_10_X
       });
 
       const createLambda = new lambda.Function(this, 'createLambda', {
         code: new lambda.AssetCode('src'),
-        handler: 'create.handler',
+        handler: 'src/create.handler',
         runtime: lambda.Runtime.NODEJS_10_X,
         environment: {
           TABLE_NAME: props.globalTableName,
@@ -112,7 +112,7 @@ export class AppStack extends cdk.Stack {
       // Key Mgmt Lambda
       const apiKeyManagerLambda = new lambda.Function(this, 'apiKeyManagerLambda', {
         code: new lambda.AssetCode('src'),
-        handler: 'keys.handler',
+        handler: 'src/keys.handler',
         runtime: lambda.Runtime.NODEJS_10_X,
         environment: {
           TABLE_NAME: regionApiKeyTable.tableName,
@@ -171,6 +171,21 @@ export class AppStack extends cdk.Stack {
           actions: ['apigateway:POST']
         })
       );
+
+      // ROUTE 53
+      const zone = route53.HostedZone.fromLookup(this, "zone", { domainName: props.domainName });
+
+      const globalApiRecord = new route53.CfnRecordSet(this, 'globalApiDomain', {
+        name: props.subDomainName.concat(props.domainName + "."),
+        type: "A",
+        aliasTarget: {
+          dnsName: restApiCustomDomain.domainNameAliasDomainName,
+          hostedZoneId: restApiCustomDomain.domainNameAliasHostedZoneId 
+        }, 
+        hostedZoneId: zone.hostedZoneId,
+        region: props.env.region,
+        setIdentifier: "api-" + props.env.region
+      });
     });
   }
 }
